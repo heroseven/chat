@@ -27,6 +27,9 @@
 {
     margin: 0;
     color: #777777;
+    display: inline-block;
+    overflow: hidden;
+    width: 100%;
 }
 
 .panel .slidedown .glyphicon, .chatpluginchat .glyphicon
