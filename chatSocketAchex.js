@@ -1,7 +1,9 @@
 $.fn.extend({ChatSocket: function(opciones) {
 					var ChatSocket=this;
-				
+				    //aquí podemos cambiar el idioma de todo
                     var idChat=$(ChatSocket).attr('id');
+                    //alert(idChat); idChat es el div donde esta la conversación del chat
+
 					defaults = {
 		                  ws,
                           Room:"RoomDeveloteca",
@@ -51,32 +53,48 @@ $.fn.extend({ChatSocket: function(opciones) {
                      var lblUsuariosOnline=opciones.lblUsuariosOnline;
                      var lblEntradaNombre=opciones.lblEntradaNombre;
                      var panelColor=opciones.panelColor;
+
+
+                    //idOnline viene a ser listaOnline
+                    //no le veo utilidad.
                     if( $('#'+idOnline).length==0 )
                     {
                      idOnline=idChat+"listaOnline";
+                        alert(idOnline);
                         $('#'+idChat).append('<br/><div id="'+idOnline+'"></div>');
                         
                     }
     
     
-    
+            //esta funcion se ejcuta solo una vez y a través de ajax
+            //se actualizan
             function IniciarConexion(){
                     conex='{"setID":"'+Room+'","passwd":"'+pass+'"}';
                     ws= new WebSocket("ws://achex.ca:4010");
                     ws.onopen= function(){ ws.send(conex); }
+
+
+                    //este es un listener que espera algun mensaje y lo muestra
+                    //en las dos partes
                     ws.onmessage= function(Mensajes){
                     var MensajesObtenidos=Mensajes.data;
+
+                        //alert(MensajesObtenidos)
+                        // es info que nos manda el servidor;
                     var obj = jQuery.parseJSON(MensajesObtenidos);
+
+
                     AgregarItem(obj);
                     
                     if(obj.sID!=null){
-                        
-                                                      
+
+                        //aquí se esta añadiendo a los usuarios conectados en su panel
+                        //el obj.sID es el id del usuario a conectar.
                     if( $('#'+obj.sID).length==0 )
                     {
                         
                       $('#listaOnline').append('<li class="list-group-item" id="'+obj.sID+'"><span class="label label-success">&#9679;</span> - '+obj.Nombre+'</li>');
-                        
+
                     }
                      
                     }
@@ -87,6 +105,7 @@ $.fn.extend({ChatSocket: function(opciones) {
                 }
           }
            IniciarConexion();
+        //mostrar interfaz, mostrar conectados y
           function iniciarChat(){
             Nombre=$('#'+lblTxtEntrar).val();
             $('#'+idDialogo).hide();
@@ -96,7 +115,7 @@ $.fn.extend({ChatSocket: function(opciones) {
             UsuarioOnline();
             getOnline();
           }
-           
+           //es para iniciar toda la intefaz y algunos componentes de queines estan online, etc.
           function CrearEntrada(){
           $('#'+idChat).append('<div id="'+idDialogo+'" class="'+classChat+'" id="InputNombre"><div class="panel-footer" style="margin-top:100px;"><div class="input-group"><input id="'+lblTxtEntrar+'" type="text" class="form-control input-sm" placeholder="'+lblEntradaNombre+'"><span class="input-group-btn"><button id="'+btnEntrar+'" class="btn btn-success btn-sm" >'+lblBtnEntrar+'</button></span></div></div></div>');
          $('#'+idOnline).append(' <div class="panel panel-'+panelColor+'"><div class="panel-heading"><span class="glyphicon glyphicon-user"></span> '+lblUsuariosOnline+'</div><div class="panel-body"><ul class="list-group" id="listaOnline"></ul></div><div class="panel-footer"><div class="input-group"><div><a href="http://develoteca.com">by develoteca.com</a></div></span></div></div></div>');
@@ -105,6 +124,9 @@ $.fn.extend({ChatSocket: function(opciones) {
               iniciarChat();
               });
         }
+
+
+            //eliminar mensaje de nombre y agregar intefaz de chat
           function CrearChat(){
              $('#'+idChat ).append( '<div class="'+classChat+'"><div class="panel panel-'+panelColor+'"><div class="panel-heading"><span class="glyphicon glyphicon-comment"></span>'+lblTitulChat+" : "+Nombre+'<div class="btn-group pull-right"><button type="button" onclick="alert(\''+textoAyuda+'\')" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-chevron-down"></span></button></div></div><div class="panel-body"><ul class="chatpluginchat"></ul></div><div class="panel-footer"><div class="input-group"><input id="'+lblTxtEnviar+'" type="text" class="form-control input-sm" placeholder="'+lblCampoEntrada+'" /><span class="input-group-btn"><button  class="btn btn-warning btn-sm" id="'+btnEnviar+'">'+lblEnviar+'</button></span></div></div></div></div><li class="left clearfix itemtemplate" style="display:none"><span class="chat-img pull-left"><img src="'+urlImg+'" alt="User Avatar" class="img-circle" id="Foto"/></span><div class="chat-body clearfix"><div class="header"><strong class="primary-font" id="Nombre">Nombre</strong><small class="pull-right text-muted"><span class="glyphicon glyphicon-asterisk"></span><span id="Tiempo">12 mins ago</span></small></div> <p id="Contenido">Contenido</p></div></li>');
               
@@ -121,6 +143,8 @@ $.fn.extend({ChatSocket: function(opciones) {
         function UsuarioOnline(){
            ws.send('{"to":"'+Room+'","Nombre":"'+Nombre+'"}');
         }
+
+    //agregar nombre, contenido y fecha.
         function AgregarItem(Obj){
             
             if((Obj.Contenido!=null)&&(Obj.Nombre!=null)){
@@ -143,7 +167,9 @@ $.fn.extend({ChatSocket: function(opciones) {
             $('.chatpluginchat .itemtemplate').removeClass("itemtemplate");
             }
         }
-           function getOnline() {
+
+    //obtener un nuevo usuario cada 3 segundos.
+    function getOnline() {
                 setInterval(UsuarioOnline, 3000);
             }
            
