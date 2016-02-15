@@ -136,15 +136,36 @@ $.fn.extend({ChatSocket: function(opciones) {
     $("#"+btnEnviar).click(function () {EnviarMensaje();});
               
         }
-      
+
+    //convertir contenido para aceptar urls
+
+    function autolink(str, attributes)
+    {
+        attributes = attributes || {};
+        var attrs = "";
+        for(name in attributes)
+            attrs += " "+ name +'="'+ attributes[name] +'"';
+
+        var reg = new RegExp("(\\s?)((http|https|ftp)://[^\\s<]+[^\\s<\.)])", "gim");
+        str = str.toString().replace(reg, "$1<a target='_blank' href='$2'"+ attrs +">$2</a>");
+
+        return str;
+    }
+
         function EnviarMensaje(){
-           ws.send('{"to":"'+Room+'","Nombre":"'+Nombre+'","Contenido":"'+$('#'+lblTxtEnviar).val()+'"}');
+
+
+
+            var contenidoWithlinks=autolink($('#'+lblTxtEnviar).val());
+
+           ws.send('{"to":"'+Room+'","Nombre":"'+Nombre+'","Contenido":"'+contenidoWithlinks+'"}');
         $("#"+lblTxtEnviar).val('');
           
         };
         function UsuarioOnline(){
            ws.send('{"to":"'+Room+'","Nombre":"'+Nombre+'"}');
         }
+
 
     //agregar nombre, contenido y fecha.
         function AgregarItem(Obj){
@@ -154,6 +175,8 @@ $.fn.extend({ChatSocket: function(opciones) {
             $( ".itemtemplate" ).clone().appendTo( ".chatpluginchat" );
             $('.chatpluginchat .itemtemplate').show(10);
             $('.chatpluginchat .itemtemplate #Nombre').html(Obj.Nombre);
+
+
             $('.chatpluginchat .itemtemplate #Contenido').html(Obj.Contenido);
              
              var formattedDate = new Date();
