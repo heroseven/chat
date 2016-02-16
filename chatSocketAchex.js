@@ -6,7 +6,7 @@ $.fn.extend({ChatSocket: function(opciones) {
 
 					defaults = {
 		                  ws,
-                          Room:"RoomDeveloteca",
+                          Room:"",
                           pass:"1234",
                           lblTitulChat:"  Chat ",
                           lblCampoEntrada:"Menssage",
@@ -69,6 +69,7 @@ $.fn.extend({ChatSocket: function(opciones) {
             //esta funcion se ejcuta solo una vez y a través de ajax
             //se actualizan
             function IniciarConexion(){
+                    contador=0;
                     conex='{"setID":"'+Room+'","passwd":"'+pass+'"}';
                     ws= new WebSocket("ws://achex.ca:4010");
                     ws.onopen= function(){ ws.send(conex); }
@@ -77,28 +78,34 @@ $.fn.extend({ChatSocket: function(opciones) {
                     //este es un listener que espera algun mensaje y lo muestra
                     //en las dos partes
                     ws.onmessage= function(Mensajes){
-                    var MensajesObtenidos=Mensajes.data;
-
-                        //alert(MensajesObtenidos)
-                        // es info que nos manda el servidor;
-                    var obj = jQuery.parseJSON(MensajesObtenidos);
+                        if(contador!=2){
+                        contador=contador+1;
 
 
-                    AgregarItem(obj);
-                    
-                    if(obj.sID!=null){
+                                var MensajesObtenidos=Mensajes.data;
 
-                        //aquí se esta añadiendo a los usuarios conectados en su panel
-                        //el obj.sID es el id del usuario a conectar.
-                    if( $('#'+obj.sID).length==0 )
-                    {
-                        
-                      $('#listaOnline').append('<li class="list-group-item" id="'+obj.sID+'"><span class="label label-success">&#9679;</span> - '+obj.Nombre+'</li>');
+                                    //alert(MensajesObtenidos)
+                                    // es info que nos manda el servidor;
+                                var obj = jQuery.parseJSON(MensajesObtenidos);
 
-                    }
-                     
-                    }
-                    
+
+                                AgregarItem(obj);
+
+                                if(obj.sID!=null){
+
+                                    //aquí se esta añadiendo a los usuarios conectados en su panel
+                                    //el obj.sID es el id del usuario a conectar.
+                                if( $('#'+obj.sID).length==0 )
+                                {
+
+                                  $('#listaOnline').append('<li class="list-group-item" id="'+obj.sID+'"><span class="label label-success">&#9679;</span> - '+obj.Nombre+'</li>');
+
+                                }
+
+                            }
+                        }else{
+
+                        }
                 }
                 ws.onclose= function(){
                     alert("Conexión cerrada");
